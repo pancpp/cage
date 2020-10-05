@@ -54,7 +54,7 @@ set(SRCS
     src/cage/controller.cpp
     src/cage/http_session.cpp
     src/cage/http_view.cpp
-    src/cage/http_listener.cpp
+    src/cage/listener.cpp
     src/cage/server.cpp
     src/cage/websock_session.cpp
     src/cage/websock_view.cpp
@@ -62,8 +62,9 @@ set(SRCS
 ################ Build LIBRARY ################
 add_library(cage ${SRCS})
 target_link_libraries(cage PUBLIC pthread)
-target_include_directories(cage PUBLIC "include/cage")
-target_include_directories(cage PRIVATE "src/cage")
+target_include_directories(cage PUBLIC "include")
+target_include_directories(cage PRIVATE "src")
+target_include_directories(cage PUBLIC "include/jthread")
 if(BUILD_SHARED_LIBS)
 	set_target_properties(cage PROPERTIES VERSION ${PROJECT_VERSION})
 endif()
