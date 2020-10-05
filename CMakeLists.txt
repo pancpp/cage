@@ -8,6 +8,7 @@ project(cage VERSION 0.0.0 LANGUAGES CXX)
 
 # Options
 option(BUILD_TESTS        "Enable building testing codes"    OFF)
+option(BUILD_EXAMPLES     "Enable building example codes"    OFF)
 option(BUILD_DOCS         "Build documentation with doxygen" OFF)
 option(DEBUG              "Build in debug mode"              OFF)
 
@@ -47,7 +48,7 @@ if(BUILD_SHARED_LIBS)
 else()
 	set(Boost_USE_STATIC_LIBS ON)
 endif()
-find_package(Boost "1.71.0" REQUIRED COMPONENTS headers filesystem)
+find_package(Boost "1.71.0" REQUIRED COMPONENTS headers)
 
 # Set sources
 set(SRCS
@@ -61,7 +62,7 @@ set(SRCS
     )
 ################ Build LIBRARY ################
 add_library(cage ${SRCS})
-target_link_libraries(cage PUBLIC pthread)
+target_link_libraries(cage PUBLIC Boost::headers pthread)
 target_include_directories(cage PUBLIC "include")
 target_include_directories(cage PRIVATE "src")
 target_include_directories(cage PUBLIC "include/jthread")
@@ -72,6 +73,11 @@ endif()
 ################ Build TEST ################
 if(BUILD_TESTS)
 	include(test/test.cmake)
+endif()
+
+################ Build EXAMPLES ################
+if(BUILD_EXAMPLES)
+	include(example/example.cmake)
 endif()
 
 ################ Build DOCS ################

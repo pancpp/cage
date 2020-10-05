@@ -6,25 +6,28 @@
  * @date Oct 04, 2020
  */
 #include "cage/http_session.hpp"
-#include "cage/websock_session.hpp"
 #include <atomic>
 #include <chrono>
 #include <cstdint>
 #include <string_view>
+#include "cage/websock_session.hpp"
 
 namespace cage {
 namespace {
 std::atomic<std::uint64_t> g_session_id(0);
-}; // namespace
+};  // namespace
 
 HttpSession::HttpSession(tcp::socket socket, ControllerPtr p_controller)
-    : session_id_(++g_session_id), tcp_stream_(std::move(socket)),
+    : session_id_(++g_session_id),
+      tcp_stream_(std::move(socket)),
       p_controller_(std::move(p_controller)) {
   // Set the timeout
   tcp_stream_.expires_after(p_controller_->SocketTimeout());
 }
 
-void HttpSession::Run() { DoRead(); }
+void HttpSession::Run() {
+  DoRead();
+}
 
 void HttpSession::DoRead() {
   // Construct a new parser for each message
@@ -63,8 +66,7 @@ void HttpSession::OnRead(beast::error_code ec, std::size_t) {
     // Create a websocket session, transferring ownership of both the socket and
     // the HTTP request
     auto p_ws_session = std::make_shared<WebsockSession>(
-        session_id_, std::move(tcp_stream_.release_socket()),
-        std::move(p_controller_));
+        session_id_, tcp_stream_.release_socket(), std::move(p_controller_));
     p_ws_session->Run(std::move(request));
     return;
   }
@@ -76,25 +78,25 @@ void HttpSession::OnRead(beast::error_code ec, std::size_t) {
       std::string(request.target().data(), request.target().size()));
   if (p_view_) {
     switch (request.method()) {
-    case http::verb::get:
-      response = p_view_->Get(request);
-      break;
-    case http::verb::head:
-      response = p_view_->Head(request);
-      break;
-    case http::verb::post:
-      response = p_view_->Post(request);
-      break;
-    case http::verb::put:
-      response = p_view_->Put(request);
-      break;
-    default:
-      std::string err_msg = "HTTP method " +
-                            std::string(request.method_string().data(),
-                                        request.method_string().size()) +
-                            " not supported";
-      response = BadRequest(request, err_msg);
-      break;
+      case http::verb::get:
+        response = p_view_->Get(request);
+        break;
+      case http::verb::head:
+        response = p_view_->Head(request);
+        break;
+      case http::verb::post:
+        response = p_view_->Post(request);
+        break;
+      case http::verb::put:
+        response = p_view_->Put(request);
+        break;
+      default:
+        std::string err_msg = "HTTP method " +
+                              std::string(request.method_string().data(),
+                                          request.method_string().size()) +
+                              " not supported";
+        response = BadRequest(request, err_msg);
+        break;
     }
   } else {
     // respond not found
@@ -111,8 +113,8 @@ void HttpSession::OnRead(beast::error_code ec, std::size_t) {
   HttpResponsePtr p_response =
       std::make_shared<HttpResponse>(std::move(response));
   http::async_write(tcp_stream_, *p_response,
-                    [self = shared_from_this(),
-                     p_response](beast::error_code ec, std::size_t len) {
+                    [self = shared_from_this(), p_response](
+                        beast::error_code ec, std::size_t len) {
                       self->OnWrite(ec, len, p_response->need_eof());
                     });
 }
@@ -159,4 +161,4 @@ HttpResponse HttpSession::BadRequest(HttpRequest const &request,
   return response;
 }
 
-} // namespace cage
+}  // namespace cage
