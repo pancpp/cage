@@ -10,9 +10,7 @@
 namespace cage {
 
 HttpResponse::HttpResponse(HttpStatus status, int version)
-    : HttpMessage{version},
-      status_{status},
-      reason_{HttpStatusToString(status)} {
+    : HttpMessage{version}, status_{status} {
 }
 
 HttpStatus HttpResponse::Status() const {
@@ -21,11 +19,10 @@ HttpStatus HttpResponse::Status() const {
 
 void HttpResponse::Status(HttpStatus status) {
   status_ = status;
-  reason_ = HttpStatusToString(status);
 }
 
-std::string const& HttpResponse::Reason() const {
-  return reason_;
+std::string HttpResponse::Reason() const {
+  return HttpStatusToString(status_);
 }
 
 bool HttpResponse::NeedEof() const {

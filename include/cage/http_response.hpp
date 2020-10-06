@@ -31,15 +31,12 @@ class HttpResponse : public HttpMessage {
 
   HttpStatus Status() const;
   void Status(HttpStatus status);
-
-  std::string const& Reason() const;
-  void Reason(std::string const& reason);
+  std::string Reason() const;
 
   bool NeedEof() const;
 
  private:
   HttpStatus status_;
-  std::string reason_;
 };
 
 }  // namespace cage
