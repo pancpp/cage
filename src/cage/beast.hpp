@@ -15,6 +15,8 @@ namespace asio = boost::asio;
 namespace beast = boost::beast;
 namespace http = beast::http;
 namespace websocket = beast::websocket;
-using asio::ip::tcp;
+using tcp = asio::ip::tcp;
+using BeastRequest = http::request<http::string_body>;
+using BeastResponse = http::response<http::string_body>;
 
-#endif // CAGE_BOOST_BEAST_HPP_
+#endif  // CAGE_BOOST_BEAST_HPP_

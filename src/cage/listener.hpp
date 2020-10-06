@@ -8,17 +8,17 @@
 #ifndef CAGE_LISTENER_HPP_
 #define CAGE_LISTENER_HPP_
 
-#include "cage/boost_beast.hpp"
-#include "cage/controller.hpp"
 #include <memory>
+#include "cage/beast.hpp"
+#include "cage/controller.hpp"
 
 namespace cage {
 
 class Listener : public std::enable_shared_from_this<Listener> {
-public:
+ public:
   using ControllerPtr = Controller::SelfPtr;
 
-public:
+ public:
   ~Listener() = default;
 
   explicit Listener(asio::io_context &ioc, tcp::endpoint ep,
@@ -26,16 +26,16 @@ public:
 
   void Run();
 
-private:
+ private:
   void DoAccept();
   void OnAccept(beast::error_code ec, tcp::socket socket);
 
-private:
+ private:
   asio::io_context &ioc_;
   tcp::acceptor acceptor_;
   ControllerPtr p_controller_;
 };
 
-} // namespace cage
+}  // namespace cage
 
-#endif // CAGE_LISTENER_HPP_
+#endif  // CAGE_LISTENER_HPP_

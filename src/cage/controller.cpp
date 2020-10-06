@@ -30,25 +30,32 @@ Controller::HttpViewPtr Controller::GetHttpView(std::string url) {
 Controller::WebsockViewPtr Controller::MakeWebsockView(HttpRequest request,
                                                        SenderType sender,
                                                        CloserType closer) {
-  std::string url(request.target().data(), request.target().size());
-  auto it = websock_view_maker_map_.find(url);
+  auto it = websock_view_maker_map_.find(request.Path());
   if (it == websock_view_maker_map_.end()) {
     return nullptr;
   }
   return it->second(std::move(request), std::move(sender), std::move(closer));
 }
 
-std::string Controller::ServerName() { return "Beast in Cage"; }
+std::string Controller::ServerName() {
+  return "Beast in Cage";
+}
 
-std::size_t Controller::WebsockMsgQueCap() { return 1024; }
+std::size_t Controller::WebsockMsgQueCap() {
+  return 1024;
+}
 
 std::chrono::seconds Controller::SocketTimeout() {
   return std::chrono::seconds(30);
 }
 
-std::size_t Controller::HttpHeadLimit() { return 8 * 1024; }
+std::size_t Controller::HttpHeadLimit() {
+  return 8 * 1024;
+}
 
-std::size_t Controller::HttpBodyLimit() { return 1024 * 1024; }
+std::size_t Controller::HttpBodyLimit() {
+  return 1024 * 1024;
+}
 
 void Controller::RegisterViewMaker(std::string url, HttpViewMaker view_maker) {
   http_view_maker_map_[url] = view_maker;
@@ -59,4 +66,4 @@ void Controller::RegisterViewMaker(std::string url,
   websock_view_maker_map_[url] = view_maker;
 }
 
-} // namespace cage
+}  // namespace cage

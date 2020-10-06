@@ -8,16 +8,16 @@
 #ifndef CAGE_HTTP_SESSION_HPP_
 #define CAGE_HTTP_SESSION_HPP_
 
-#include "cage/boost_beast.hpp"
-#include "cage/controller.hpp"
 #include <cstddef>
 #include <memory>
 #include <optional>
+#include "cage/beast.hpp"
+#include "cage/controller.hpp"
 
 namespace cage {
 
 class HttpSession : public std::enable_shared_from_this<HttpSession> {
-public:
+ public:
   using ControllerPtr = Controller::SelfPtr;
   using HttpViewPtr = HttpView::SelfPtr;
 
@@ -27,14 +27,14 @@ public:
   using RequestParser = http::request_parser<http::string_body>;
   using RequestParserPtr = std::unique_ptr<RequestParser>;
 
-public:
+ public:
   ~HttpSession() = default;
 
   HttpSession(tcp::socket socket, ControllerPtr p_controller);
 
   void Run();
 
-private:
+ private:
   void DoRead();
   void OnRead(beast::error_code ec, std::size_t);
 
@@ -42,11 +42,11 @@ private:
 
   void DoClose();
 
-private:
-  HttpResponse NotFound(HttpRequest const &request, std::string const &msg);
-  HttpResponse BadRequest(HttpRequest const &request, std::string const &msg);
+ private:
+  HttpResponse NotFound(HttpRequest const &request, std::string &&msg);
+  HttpResponse BadRequest(HttpRequest const &request, std::string &&msg);
 
-private:
+ private:
   std::uint64_t session_id_;
 
   StreamType tcp_stream_;
@@ -57,6 +57,6 @@ private:
   HttpViewPtr p_view_;
 };
 
-} // namespace cage
+}  // namespace cage
 
-#endif // CAGE_HTTP_SESSION_HPP_
+#endif  // CAGE_HTTP_SESSION_HPP_

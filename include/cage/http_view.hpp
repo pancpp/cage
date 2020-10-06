@@ -8,17 +8,18 @@
 #ifndef CAGE_HTTP_VIEW_HPP_
 #define CAGE_HTTP_VIEW_HPP_
 
-#include "cage/http.hpp"
 #include <memory>
 #include <string>
+#include "cage/http_request.hpp"
+#include "cage/http_response.hpp"
 
 namespace cage {
 
 class HttpView {
-public:
+ public:
   using SelfPtr = std::shared_ptr<HttpView>;
 
-public:
+ public:
   virtual ~HttpView() = 0;
 
   virtual HttpResponse Get(HttpRequest const &request);
@@ -26,11 +27,11 @@ public:
   virtual HttpResponse Post(HttpRequest const &request);
   virtual HttpResponse Put(HttpRequest const &request);
 
-protected:
+ protected:
   virtual HttpResponse BadRequest(HttpRequest const &request,
-                                  std::string const &msg);
+                                  std::string &&msg);
 };
 
-} // namespace cage
+}  // namespace cage
 
-#endif // CAGE_HTTP_VIEW_HPP_
+#endif  // CAGE_HTTP_VIEW_HPP_

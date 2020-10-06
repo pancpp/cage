@@ -52,8 +52,15 @@ find_package(Boost "1.71.0" REQUIRED COMPONENTS headers)
 
 # Set sources
 set(SRCS
-    src/cage/controller.cpp
-    src/cage/http_session.cpp
+	src/cage/beast_http.cpp
+	src/cage/controller.cpp
+	src/cage/http_field.cpp
+	src/cage/http_message.cpp
+	src/cage/http_method.cpp
+	src/cage/http_request.cpp
+	src/cage/http_response.cpp
+	src/cage/http_session.cpp
+	src/cage/http_status.cpp
     src/cage/http_view.cpp
     src/cage/listener.cpp
     src/cage/server.cpp

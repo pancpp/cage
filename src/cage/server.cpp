@@ -6,14 +6,15 @@
  * @date Oct 04, 2020
  */
 #include "cage/server.hpp"
-#include "cage/boost_beast.hpp"
-#include "cage/listener.hpp"
 #include <memory>
+#include "cage/beast.hpp"
+#include "cage/listener.hpp"
 
 namespace cage {
 
 Server::Server(std::uint16_t port, std::size_t num_threads)
-    : port_(port), thread_pool_(num_threads) {}
+    : port_(port), thread_pool_(num_threads) {
+}
 
 void Server::SetController(ControllerPtr p_controller) {
   p_controller_ = std::move(p_controller);
@@ -29,6 +30,8 @@ void Server::Start() {
   }
 }
 
-void Server::Stop() { ioc_.stop(); }
+void Server::Stop() {
+  ioc_.stop();
+}
 
-} // namespace cage
+}  // namespace cage

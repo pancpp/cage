@@ -8,19 +8,18 @@
 #ifndef CAGE_WEBSOCK_SESSION_HPP_
 #define CAGE_WEBSOCK_SESSION_HPP_
 
-#include "boost/circular_buffer.hpp"
-#include "cage/boost_beast.hpp"
-#include "cage/controller.hpp"
-#include "cage/http.hpp"
 #include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string_view>
+#include "boost/circular_buffer.hpp"
+#include "cage/beast.hpp"
+#include "cage/controller.hpp"
 
 namespace cage {
 
 class WebsockSession : public std::enable_shared_from_this<WebsockSession> {
-public:
+ public:
   using StreamType = websocket::stream<beast::tcp_stream>;
   using BufferType = beast::flat_buffer;
 
@@ -31,16 +30,16 @@ public:
   using ControllerPtr = Controller::SelfPtr;
   using WebsockViewPtr = WebsockView::SelfPtr;
 
-public:
+ public:
   ~WebsockSession() = default;
 
   explicit WebsockSession(std::uint64_t session_id, tcp::socket socket,
                           ControllerPtr p_controller);
 
-  void Run(HttpRequest request);
+  void Run(BeastRequest beast_request);
 
-private:
-  void OnAccept(beast::error_code ec, HttpRequest request);
+ private:
+  void OnAccept(beast::error_code ec, BeastRequest beast_request);
 
   void DoRead();
   void OnRead(beast::error_code ec, std::size_t);
@@ -54,7 +53,7 @@ private:
   void DoClose(websocket::close_reason rc);
   void OnClose(beast::error_code ec);
 
-private:
+ private:
   std::uint64_t session_id_;
 
   StreamType ws_stream_;
@@ -67,6 +66,6 @@ private:
   SendMsgPtr p_msg_on_sending_;
 };
 
-} // namespace cage
+}  // namespace cage
 
-#endif // CAGE_WEBSOCK_SESSION_HPP_
+#endif  // CAGE_WEBSOCK_SESSION_HPP_

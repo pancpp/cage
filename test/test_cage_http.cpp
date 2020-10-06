@@ -12,8 +12,6 @@
 #include "cage/server.hpp"
 
 using namespace cage;
-namespace beast = boost::beast;
-namespace http = beast::http;
 
 class HttpViewRoot : public HttpView {
  public:
@@ -22,9 +20,8 @@ class HttpViewRoot : public HttpView {
   }
 
   HttpResponse Get(HttpRequest const& request) override {
-    HttpResponse res{http::status::ok, request.version()};
-    res.body() = "hello, world";
-    res.prepare_payload();
+    HttpResponse res{HttpStatus::ok, request.Version()};
+    res.Body("hello, world");
     return res;
   }
 

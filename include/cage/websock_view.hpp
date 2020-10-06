@@ -8,22 +8,22 @@
 #ifndef CAGE_WEBSOCK_VIEW_HPP_
 #define CAGE_WEBSOCK_VIEW_HPP_
 
-#include "cage/http.hpp"
 #include <functional>
 #include <memory>
 #include <string>
 #include <string_view>
 #include <system_error>
+#include "cage/http_request.hpp"
 
 namespace cage {
 
 class WebsockView {
-public:
+ public:
   using SelfPtr = std::shared_ptr<WebsockView>;
   using SenderType = std::function<void(std::string_view msg, bool is_txt)>;
   using CloserType = std::function<void()>;
 
-public:
+ public:
   virtual ~WebsockView() = default;
   explicit WebsockView(HttpRequest request, SenderType sender,
                        CloserType closer);
@@ -37,12 +37,12 @@ public:
 
   virtual HttpRequest const &GetHttpRequest() const;
 
-private:
+ private:
   HttpRequest request_;
   SenderType sender_;
   CloserType closer_;
 };
 
-} // namespace cage
+}  // namespace cage
 
-#endif // CAGE_WEBSOCK_VIEW_HPP_
+#endif  // CAGE_WEBSOCK_VIEW_HPP_
