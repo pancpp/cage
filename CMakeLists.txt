@@ -52,17 +52,11 @@ find_package(Boost "1.71.0" REQUIRED COMPONENTS headers)
 
 # Set sources
 set(SRCS
-	src/cage/beast_http.cpp
 	src/cage/controller.cpp
-	src/cage/http_field.cpp
-	src/cage/http_message.cpp
-	src/cage/http_method.cpp
-	src/cage/http_request.cpp
-	src/cage/http_response.cpp
 	src/cage/http_session.cpp
-	src/cage/http_status.cpp
     src/cage/http_view.cpp
-    src/cage/listener.cpp
+	src/cage/listener.cpp
+	src/cage/router.cpp
     src/cage/server.cpp
     src/cage/websock_session.cpp
     src/cage/websock_view.cpp
@@ -70,9 +64,10 @@ set(SRCS
 ################ Build LIBRARY ################
 add_library(cage ${SRCS})
 target_link_libraries(cage PUBLIC Boost::headers pthread)
-target_include_directories(cage PUBLIC "include")
-target_include_directories(cage PRIVATE "src")
-target_include_directories(cage PUBLIC "include/jthread")
+target_include_directories(cage PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_include_directories(cage PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/jthread")
+target_include_directories(cage PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
+
 if(BUILD_SHARED_LIBS)
 	set_target_properties(cage PROPERTIES VERSION ${PROJECT_VERSION})
 endif()

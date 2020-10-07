@@ -10,6 +10,7 @@
 
 #include <memory>
 #include "cage/beast.hpp"
+#include "cage/boost.hpp"
 #include "cage/controller.hpp"
 
 namespace cage {

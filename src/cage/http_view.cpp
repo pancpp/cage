@@ -7,8 +7,6 @@
  */
 #include "cage/http_view.hpp"
 #include "cage/beast.hpp"
-#include "cage/beast_http.hpp"
-#include "cage/http_status.hpp"
 
 namespace cage {
 
@@ -33,9 +31,9 @@ HttpResponse HttpView::Put(HttpRequest const &request) {
 
 HttpResponse HttpView::BadRequest(HttpRequest const &request,
                                   std::string &&msg) {
-  HttpResponse response{HttpStatus::bad_request, request.Version()};
-  response.Set(HttpField::content_type, "text/plain");
-  response.Body(std::move(msg));
+  HttpResponse response{http::status::bad_request, request.version()};
+  response.set(http::field::content_type, "text/plain");
+  response.body() = std::move(msg);
 
   return response;
 }

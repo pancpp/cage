@@ -8,7 +8,11 @@
 #include <string>
 #include "boost/asio/io_context.hpp"
 #include "boost/asio/signal_set.hpp"
+#include "cage/beast.hpp"
 #include "cage/controller.hpp"
+#include "cage/http_request.hpp"
+#include "cage/http_response.hpp"
+#include "cage/router.hpp"
 #include "cage/server.hpp"
 
 using namespace cage;
@@ -20,8 +24,9 @@ class HttpViewRoot : public HttpView {
   }
 
   HttpResponse Get(HttpRequest const& request) override {
-    HttpResponse res{HttpStatus::ok, request.Version()};
-    res.Body("hello, world");
+    HttpResponse res{http::status::ok, request.version()};
+    res.body() = "hello, world";
+
     return res;
   }
 
@@ -34,8 +39,12 @@ int main() {
   Server server(1234);
   std::cout << "Server created" << std::endl;
 
+  std::shared_ptr<Router> p_router = std::make_shared<Router>();
   std::shared_ptr<Controller> p_controller = std::make_shared<Controller>();
-  p_controller->RegisterViewMaker("/", std::bind(&HttpViewRoot::MakeView));
+
+  p_router->RegisterPath("/", std::bind(&HttpViewRoot::MakeView));
+  p_controller->RegisterRouter(p_router);
+
   server.SetController(p_controller);
   std::cout << "Set controller" << std::endl;
 

@@ -8,7 +8,6 @@
 #include "cage/websock_session.hpp"
 #include <string>
 #include <string_view>
-#include "cage/beast_http.hpp"
 #include "cage/http_request.hpp"
 
 namespace cage {
@@ -21,7 +20,7 @@ WebsockSession::WebsockSession(std::uint64_t session_id, tcp::socket socket,
       send_msg_que_(1024) {
 }
 
-void WebsockSession::Run(BeastRequest beast_request) {
+void WebsockSession::Run(HttpRequest request) {
   // Set suggested timeout settings for the websocket
   ws_stream_.set_option(
       websocket::stream_base::timeout::suggested(beast::role_type::server));
@@ -33,14 +32,13 @@ void WebsockSession::Run(BeastRequest beast_request) {
       }));
 
   // Accept the websocket handshake
-  ws_stream_.async_accept(beast_request, [self = shared_from_this(),
-                                          beast_request](beast::error_code ec) {
-    self->OnAccept(ec, std::move(beast_request));
-  });
+  ws_stream_.async_accept(
+      request, [self = shared_from_this(), request](beast::error_code ec) {
+        self->OnAccept(ec, std::move(request));
+      });
 }
 
-void WebsockSession::OnAccept(beast::error_code ec,
-                              BeastRequest beast_request) {
+void WebsockSession::OnAccept(beast::error_code ec, HttpRequest request) {
   // Handle the error, if any
   if (ec) {
     return;
@@ -48,7 +46,7 @@ void WebsockSession::OnAccept(beast::error_code ec,
 
   // Create viewer
   p_view_ = p_controller_->MakeWebsockView(
-      BeastRequestToHttp(std::move(beast_request)),
+      std::move(request),
       [self = shared_from_this()](std::string_view msg, bool is_txt) {
         self->DoSend(msg, is_txt);
       },

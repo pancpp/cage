@@ -12,7 +12,8 @@ namespace cage {
 
 Listener::Listener(asio::io_context &ioc, tcp::endpoint ep,
                    ControllerPtr p_controller)
-    : ioc_(ioc), acceptor_(asio::make_strand(ioc)),
+    : ioc_(ioc),
+      acceptor_(asio::make_strand(ioc)),
       p_controller_(std::move(p_controller)) {
   // Open the acceptor
   acceptor_.open(ep.protocol());
@@ -27,7 +28,9 @@ Listener::Listener(asio::io_context &ioc, tcp::endpoint ep,
   acceptor_.listen(asio::socket_base::max_listen_connections);
 }
 
-void Listener::Run() { DoAccept(); }
+void Listener::Run() {
+  DoAccept();
+}
 
 void Listener::DoAccept() {
   // The new connection gets its own strand
@@ -50,4 +53,4 @@ void Listener::OnAccept(beast::error_code ec, tcp::socket socket) {
   DoAccept();
 }
 
-} // namespace cage
+}  // namespace cage

@@ -10,10 +10,10 @@
 #include <chrono>
 #include <cstdint>
 #include <string_view>
-#include "cage/beast_http.hpp"
 #include "cage/websock_session.hpp"
 
 namespace cage {
+
 namespace {
 std::atomic<std::uint64_t> g_session_id(0);
 };  // namespace
@@ -60,59 +60,61 @@ void HttpSession::OnRead(beast::error_code ec, std::size_t) {
   }
 
   // Get the http request
-  auto beast_request = std::move(p_parser_->get());
+  auto request = std::move(p_parser_->get());
 
   // Check whether it is a websocket upgrade
-  if (websocket::is_upgrade(beast_request)) {
+  if (websocket::is_upgrade(request)) {
     // Create a websocket session, transferring ownership of both the socket and
     // the HTTP request
     auto p_ws_session = std::make_shared<WebsockSession>(
         session_id_, tcp_stream_.release_socket(), std::move(p_controller_));
-    p_ws_session->Run(std::move(beast_request));
+    p_ws_session->Run(std::move(request));
     return;
   }
 
   // Handle the HTTP request
-  HttpRequest http_request = BeastRequestToHttp(std::move(beast_request));
-  HttpResponse http_response;
+  HttpResponse response;
 
-  p_view_ = p_controller_->GetHttpView(http_request.Path());
+  p_view_ = p_controller_->GetHttpView(
+      std::string(request.target().data(), request.target().size()));
   if (p_view_) {
-    switch (http_request.Method()) {
-      case HttpMethod::get:
-        http_response = p_view_->Get(http_request);
+    switch (request.method()) {
+      case http::verb::get:
+        response = p_view_->Get(request);
         break;
-      case HttpMethod::head:
-        http_response = p_view_->Head(http_request);
+      case http::verb::head:
+        response = p_view_->Head(request);
         break;
-      case HttpMethod::post:
-        http_response = p_view_->Post(http_request);
+      case http::verb::post:
+        response = p_view_->Post(request);
         break;
-      case HttpMethod::put:
-        http_response = p_view_->Put(http_request);
+      case http::verb::put:
+        response = p_view_->Put(request);
         break;
       default:
-        http_response = BadRequest(
-            http_request,
-            "HTTP method " + http_request.MethodString() + " not supported");
+        response = BadRequest(
+            request,
+            "HTTP method " +
+                std::string(request.target().data(), request.target().size()) +
+                " not supported");
         break;
     }
   } else {
     // respond not found
-    http_response =
-        NotFound(http_request,
-                 "HTTP method " + http_request.MethodString() + " not found");
+    response = NotFound(request, "HTTP method " +
+                                     std::string(request.target().data(),
+                                                 request.target().size()) +
+                                     " not found");
   }
 
-  http_response.Set(HttpField::server, p_controller_->ServerName());
-  http_response.KeepAlive(http_request.KeepAlive());
+  response.set(http::field::server, p_controller_->ServerName());
+  response.keep_alive(request.keep_alive());
 
-  auto p_beast_response = std::make_shared<BeastResponse>(
-      HttpResponseToBeast(std::move(http_response)));
-  http::async_write(tcp_stream_, *p_beast_response,
-                    [self = shared_from_this(), p_beast_response](
+  auto p_response = std::make_shared<HttpResponse>(std::move(response));
+  http::async_write(tcp_stream_, *p_response,
+                    [self = shared_from_this(), p_response](
                         beast::error_code ec, std::size_t len) {
-                      self->OnWrite(ec, len, p_beast_response->need_eof());
+                      self->OnWrite(ec, len, p_response->need_eof());
                     });
 }
 
@@ -142,17 +144,18 @@ void HttpSession::DoClose() {
 
 HttpResponse HttpSession::NotFound(HttpRequest const &request,
                                    std::string &&msg) {
-  HttpResponse response{HttpStatus::not_found, request.Version()};
-  response.Set(HttpField::content_type, "text/plain");
-  response.Body(std::move(msg));
+  HttpResponse response{http::status::not_found, request.version()};
+  response.set(http::field::content_type, "text/plain");
+  response.body() = std::move(msg);
+
   return response;
 }
 
 HttpResponse HttpSession::BadRequest(HttpRequest const &request,
                                      std::string &&msg) {
-  HttpResponse response{HttpStatus::bad_request, request.Version()};
-  response.Set(HttpField::content_type, "text/plain");
-  response.Body(std::move(msg));
+  HttpResponse response{http::status::bad_request, request.version()};
+  response.set(http::field::content_type, "text/plain");
+  response.body() = std::move(msg);
   return response;
 }
 

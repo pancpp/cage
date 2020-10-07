@@ -14,6 +14,7 @@
 #include <string_view>
 #include "boost/circular_buffer.hpp"
 #include "cage/beast.hpp"
+#include "cage/boost.hpp"
 #include "cage/controller.hpp"
 
 namespace cage {
@@ -36,10 +37,10 @@ class WebsockSession : public std::enable_shared_from_this<WebsockSession> {
   explicit WebsockSession(std::uint64_t session_id, tcp::socket socket,
                           ControllerPtr p_controller);
 
-  void Run(BeastRequest beast_request);
+  void Run(HttpRequest request);
 
  private:
-  void OnAccept(beast::error_code ec, BeastRequest beast_request);
+  void OnAccept(beast::error_code ec, HttpRequest request);
 
   void DoRead();
   void OnRead(beast::error_code ec, std::size_t);

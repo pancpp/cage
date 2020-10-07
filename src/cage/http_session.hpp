@@ -12,7 +12,10 @@
 #include <memory>
 #include <optional>
 #include "cage/beast.hpp"
+#include "cage/boost.hpp"
 #include "cage/controller.hpp"
+#include "cage/http_request.hpp"
+#include "cage/http_response.hpp"
 
 namespace cage {
 

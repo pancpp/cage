@@ -8,6 +8,7 @@
 #include "cage/server.hpp"
 #include <memory>
 #include "cage/beast.hpp"
+#include "cage/boost.hpp"
 #include "cage/listener.hpp"
 
 namespace cage {

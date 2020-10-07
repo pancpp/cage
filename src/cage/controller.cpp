@@ -9,32 +9,36 @@
 
 namespace cage {
 
-Controller::HttpViewPtr Controller::GetHttpView(std::string url) {
-  auto it = http_view_map_.find(url);
-  if (it != http_view_map_.end()) {
-    return it->second;
+void Controller::RegisterRouter(RouterPtr p_router) {
+  router_vec_.push_back(std::move(p_router));
+}
+
+Controller::HttpViewPtr Controller::GetHttpView(std::string const& target) {
+  std::string url = ParseUrl(target);
+  for (auto& p_router : router_vec_) {
+    auto p_view = p_router->GetHttpView(url);
+    if (p_view) {
+      return p_view;
+    }
   }
 
-  // Create a new http view instance
-  auto it2 = http_view_maker_map_.find(url);
-  if (it2 == http_view_maker_map_.end()) {
-    return nullptr;
-  }
-
-  auto p_view = it2->second();
-  http_view_map_.insert({url, p_view});
-
-  return p_view;
+  return nullptr;
 }
 
 Controller::WebsockViewPtr Controller::MakeWebsockView(HttpRequest request,
                                                        SenderType sender,
                                                        CloserType closer) {
-  auto it = websock_view_maker_map_.find(request.Path());
-  if (it == websock_view_maker_map_.end()) {
-    return nullptr;
+  std::string url = ParseUrl(
+      std::string_view(request.target().data(), request.target().size()));
+
+  for (auto& p_router : router_vec_) {
+    auto view_maker = p_router->GetWebsockViewMaker(url);
+    if (view_maker) {
+      return view_maker(std::move(request), std::move(sender),
+                        std::move(closer));
+    }
   }
-  return it->second(std::move(request), std::move(sender), std::move(closer));
+  return nullptr;
 }
 
 std::string Controller::ServerName() {
@@ -57,13 +61,8 @@ std::size_t Controller::HttpBodyLimit() {
   return 1024 * 1024;
 }
 
-void Controller::RegisterViewMaker(std::string url, HttpViewMaker view_maker) {
-  http_view_maker_map_[url] = view_maker;
-}
-
-void Controller::RegisterViewMaker(std::string url,
-                                   WebsockViewMaker view_maker) {
-  websock_view_maker_map_[url] = view_maker;
+std::string Controller::ParseUrl(std::string_view target) {
+  return std::string(target.data(), target.size());
 }
 
 }  // namespace cage
