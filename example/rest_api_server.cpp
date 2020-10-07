@@ -17,19 +17,24 @@
 
 using namespace cage;
 
-class HttpViewRoot : public HttpView {
+class HttpView1 : public HttpView {
  public:
   HttpResponse Get(HttpRequest const& request) override {
     HttpResponse res{http::status::ok, request.version()};
-    res.body() = "Hello, " +
+    res.body() = "GET from " +
                  std::string(request.target().data(), request.target().size());
 
     return res;
   }
+};
 
+class HttpView2 : public HttpView {
+ public:
   HttpResponse Post(HttpRequest const& request) override {
     HttpResponse res{http::status::ok, request.version()};
-    res.body() = "This the post: " + request.body();
+    res.body() = "POST from " +
+                 std::string(request.target().data(), request.target().size()) +
+                 ": " + request.body();
     return res;
   }
 };
@@ -41,9 +46,10 @@ int main() {
   std::shared_ptr<Router> p_router = std::make_shared<Router>();
   std::shared_ptr<Controller> p_controller = std::make_shared<Controller>();
 
-  p_router->RegisterPath("/", [] { return std::make_shared<HttpViewRoot>(); });
-  p_router->RegisterPath("/hello/[0-9]+/",
-                         [] { return std::make_shared<HttpViewRoot>(); });
+  p_router->RegisterPath("/api/1/",
+                         [] { return std::make_shared<HttpView1>(); });
+  p_router->RegisterPath("/api/2/[0-9]+/",
+                         [] { return std::make_shared<HttpView2>(); });
   p_controller->RegisterRouter(p_router);
   server.SetController(p_controller);
 
