@@ -29,6 +29,13 @@ HttpResponse HttpView::Put(HttpRequest const &request) {
   return BadRequest(request, "HTTP method PUT not supported");
 }
 
+HttpResponse HttpView::Handle(HttpRequest const &request) {
+  return BadRequest(request, "HTTP method " +
+                                 std::string(request.method_string().data(),
+                                             request.method_string().size()) +
+                                 " not supported");
+}
+
 HttpResponse HttpView::BadRequest(HttpRequest const &request,
                                   std::string &&msg) {
   HttpResponse response{http::status::bad_request, request.version()};

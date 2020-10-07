@@ -27,6 +27,8 @@ class HttpView {
   virtual HttpResponse Post(HttpRequest const &request);
   virtual HttpResponse Put(HttpRequest const &request);
 
+  virtual HttpResponse Handle(HttpRequest const &request);
+
  protected:
   virtual HttpResponse BadRequest(HttpRequest const &request,
                                   std::string &&msg);

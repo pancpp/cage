@@ -42,7 +42,7 @@ Controller::WebsockViewPtr Controller::MakeWebsockView(HttpRequest request,
 }
 
 std::string Controller::ServerName() {
-  return "Beast in Cage";
+  return "BeastInCage/0.0.1";
 }
 
 std::size_t Controller::WebsockMsgQueCap() {

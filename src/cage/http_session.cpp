@@ -92,11 +92,7 @@ void HttpSession::OnRead(beast::error_code ec, std::size_t) {
         response = p_view_->Put(request);
         break;
       default:
-        response = BadRequest(
-            request,
-            "HTTP method " +
-                std::string(request.target().data(), request.target().size()) +
-                " not supported");
+        response = p_view_->Handle(request);
         break;
     }
   } else {
