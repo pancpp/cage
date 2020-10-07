@@ -9,7 +9,6 @@
 #define CAGE_WEBSOCK_SESSION_HPP_
 
 #include <cstddef>
-#include <cstdint>
 #include <memory>
 #include <string_view>
 #include "boost/circular_buffer.hpp"
@@ -34,8 +33,7 @@ class WebsockSession : public std::enable_shared_from_this<WebsockSession> {
  public:
   ~WebsockSession() = default;
 
-  explicit WebsockSession(std::uint64_t session_id, tcp::socket socket,
-                          ControllerPtr p_controller);
+  explicit WebsockSession(tcp::socket socket, ControllerPtr p_controller);
 
   void Run(HttpRequest request);
 
@@ -55,8 +53,6 @@ class WebsockSession : public std::enable_shared_from_this<WebsockSession> {
   void OnClose(beast::error_code ec);
 
  private:
-  std::uint64_t session_id_;
-
   StreamType ws_stream_;
   BufferType read_buff_;
 

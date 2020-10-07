@@ -12,10 +12,8 @@
 
 namespace cage {
 
-WebsockSession::WebsockSession(std::uint64_t session_id, tcp::socket socket,
-                               ControllerPtr p_controller)
-    : session_id_(session_id),
-      ws_stream_(std::move(socket)),
+WebsockSession::WebsockSession(tcp::socket socket, ControllerPtr p_controller)
+    : ws_stream_(std::move(socket)),
       p_controller_(std::move(p_controller)),
       send_msg_que_(1024) {
 }

@@ -10,7 +10,6 @@
 
 #include <cstddef>
 #include <memory>
-#include <optional>
 #include "cage/beast.hpp"
 #include "cage/boost.hpp"
 #include "cage/controller.hpp"
@@ -50,8 +49,6 @@ class HttpSession : public std::enable_shared_from_this<HttpSession> {
   HttpResponse BadRequest(HttpRequest const &request, std::string &&msg);
 
  private:
-  std::uint64_t session_id_;
-
   StreamType tcp_stream_;
   BufferType read_buff_;
   RequestParserPtr p_parser_;

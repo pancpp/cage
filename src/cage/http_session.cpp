@@ -6,22 +6,14 @@
  * @date Oct 04, 2020
  */
 #include "cage/http_session.hpp"
-#include <atomic>
 #include <chrono>
-#include <cstdint>
 #include <string_view>
 #include "cage/websock_session.hpp"
 
 namespace cage {
 
-namespace {
-std::atomic<std::uint64_t> g_session_id(0);
-};  // namespace
-
 HttpSession::HttpSession(tcp::socket socket, ControllerPtr p_controller)
-    : session_id_(++g_session_id),
-      tcp_stream_(std::move(socket)),
-      p_controller_(std::move(p_controller)) {
+    : tcp_stream_(std::move(socket)), p_controller_(std::move(p_controller)) {
   // Set the timeout
   tcp_stream_.expires_after(p_controller_->SocketTimeout());
 }
@@ -67,7 +59,7 @@ void HttpSession::OnRead(beast::error_code ec, std::size_t) {
     // Create a websocket session, transferring ownership of both the socket and
     // the HTTP request
     auto p_ws_session = std::make_shared<WebsockSession>(
-        session_id_, tcp_stream_.release_socket(), std::move(p_controller_));
+        tcp_stream_.release_socket(), std::move(p_controller_));
     p_ws_session->Run(std::move(request));
     return;
   }
