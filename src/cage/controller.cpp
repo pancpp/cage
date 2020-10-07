@@ -62,7 +62,12 @@ std::size_t Controller::HttpBodyLimit() {
 }
 
 std::string Controller::ParseUrl(std::string_view target) {
-  return std::string(target.data(), target.size());
+  std::size_t qsym_pos = target.find('?');
+  if (qsym_pos == std::string_view::npos) {
+    return std::string(target.data(), target.size());
+  } else {
+    return std::string(target.data(), qsym_pos);
+  }
 }
 
 }  // namespace cage
