@@ -12,15 +12,14 @@ namespace cage {
 void Router::RegisterPath(std::string const& regex_path,
                           HttpViewMaker http_view_maker) {
   std::regex r(regex_path, std::regex::ECMAScript | std::regex::icase);
-  http_maker_routes_.push_back(std::tuple(r, std::move(http_view_maker)));
+  http_maker_routes_.push_back(std::tuple(r, http_view_maker));
   http_view_route_.push_back(std::tuple(r, http_view_maker()));
 }
 
 void Router::RegisterPath(std::string const& regex_path,
                           WebsockViewMaker websock_view_maker) {
   std::regex r(regex_path, std::regex::ECMAScript | std::regex::icase);
-  websock_maker_routes_.push_back(
-      std::tuple(std::move(r), std::move(websock_view_maker)));
+  websock_maker_routes_.push_back(std::tuple(r, websock_view_maker));
 }
 
 Router::HttpViewMaker Router::GetHttpViewMaker(std::string const& path) const {
