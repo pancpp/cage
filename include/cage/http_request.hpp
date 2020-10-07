@@ -31,17 +31,16 @@ class HttpRequest : public HttpMessage {
   HttpMethod Method() const;
   void Method(HttpMethod method);
 
-  std::string const &MethodString() const;
+  std::string MethodString() const;
   void MethodString(std::string const &method_string);
-  void MethodString(std::string method_string);
+  void MethodString(std::string &&method_string);
 
   std::string const &Path() const;
   void Path(std::string const &path);
-  void Path(std::string path);
+  void Path(std::string &&path);
 
  private:
   HttpMethod method_;
-  std::string method_string_;
   std::string path_;
 };
 

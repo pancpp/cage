@@ -47,7 +47,7 @@ void HttpRequest::Path(std::string const &path) {
   path_ = path;
 }
 
-void HttpRequest::Path(std::string path) {
+void HttpRequest::Path(std::string &&path) {
   path_ = std::move(path);
 }
 
