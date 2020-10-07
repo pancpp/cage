@@ -57,7 +57,8 @@ set(SRCS
     src/cage/http_view.cpp
 	src/cage/listener.cpp
 	src/cage/router.cpp
-    src/cage/server.cpp
+	src/cage/server.cpp
+	src/cage/url.cpp
     src/cage/websock_session.cpp
     src/cage/websock_view.cpp
     )
